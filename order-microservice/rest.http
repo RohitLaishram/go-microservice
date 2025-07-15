@@ -1,0 +1,19 @@
+GET http://localhost:8080/test
+
+
+##
+POST http://localhost:8080/orders
+Content-Type: application/json
+
+{
+    "userId": 1,
+    "productId": "sample-product-id2",
+    "quantity": 2,
+    "totalAmount": 100.0,
+    "status": "PENDING",
+    "paymentId": null
+}
+
+###
+
+GET http://localhost:8080/orders/84a32108-bc61-4d31-b931-08fa8656201e
