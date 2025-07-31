@@ -48,7 +48,7 @@ func ConnectWithGORM() (*gorm.DB, error) {
 	})
 
 	// DSN format
-	dsn := fmt.Sprintf("%s:%s@cloudsqlconn(localhost:3306)/%s?parseTime=true",
+	dsn := fmt.Sprintf("%s:%s@cloudsqlconn(34.9.104.215:3306)/%s?parseTime=true",
 		dbUser, dbPwd, dbName)
 
 	// Initialize GORM with the DSN

@@ -6,7 +6,6 @@ import (
 
 	// "database/sql"
 	"fmt"
-	"log"
 	"net"
 	"os"
 
@@ -17,19 +16,14 @@ import (
 )
 
 func ConnectWithGORM() (*gorm.DB, error) {
-	mustGetenv := func(k string) string {
-		v := os.Getenv(k)
-		if v == "" {
-			log.Fatalf("Fatal Error: %s environment variable not set.", k)
-		}
-		return v
-	}
-
-	dbUser := mustGetenv("DB_USER")
-	dbPwd := mustGetenv("DB_PASS")
-	dbName := mustGetenv("DB_NAME")
-	instanceConnectionName := mustGetenv("INSTANCE_CONNECTION_NAME")
+	dbUser := os.Getenv("DB_USER")
+	dbPwd := os.Getenv("DB_PASS")
+	dbName := os.Getenv("DB_NAME")
+	instanceConnectionName := os.Getenv("INSTANCE_CONNECTION_NAME")
 	usePrivate := os.Getenv("PRIVATE_IP")
+
+	fmt.Printf("DB_USER: %s\nDB_PASS: %s\nDB_NAME: %s\nINSTANCE_CONNECTION_NAME: %s\nPRIVATE_IP: %s\n",
+		dbUser, dbPwd, dbName, instanceConnectionName, usePrivate)
 
 	// Create Cloud SQL dialer
 	d, err := cloudsqlconn.NewDialer(context.Background(), cloudsqlconn.WithLazyRefresh())
@@ -48,7 +42,7 @@ func ConnectWithGORM() (*gorm.DB, error) {
 	})
 
 	// DSN format
-	dsn := fmt.Sprintf("%s:%s@cloudsqlconn(localhost:3306)/%s?parseTime=true",
+	dsn := fmt.Sprintf("%s:%s@cloudsqlconn(34.9.104.215:3306)/%s?parseTime=true",
 		dbUser, dbPwd, dbName)
 
 	// Initialize GORM with the DSN

@@ -27,8 +27,38 @@ func (oc *OrderController) RegisterRoutes(app *iris.Application) {
 	{
 		order.Post("/", oc.CreateOrder)
 		order.Get("/{id:string}", oc.GetOrder)
+		order.Patch("/{id:string}/paid", oc.PaidOrder)
 		order.Patch("/{id:string}/status", oc.UpdateOrderStatus)
 	}
+}
+
+func (oc *OrderController) PaidOrder(ctx iris.Context) {
+	id := ctx.Params().Get("id")
+	uuidID, err := uuid.Parse(id)
+	if err != nil {
+		ctx.StatusCode(iris.StatusBadRequest)
+		ctx.JSON(iris.Map{"error": "Invalid order ID"})
+		return
+	}
+
+	order, err := oc.Repo.Get(uuidID)
+	if err != nil {
+		ctx.StatusCode(iris.StatusNotFound)
+		ctx.JSON(iris.Map{"error": "Order not found"})
+		return
+	}
+
+	pubErr := pubsub.PublishOrderEvent(pubsub.OrderEvent{
+		OrderID: order.ID,
+		UserID:  order.UserID,
+		Amount:  order.TotalAmount,
+	})
+
+	if pubErr != nil {
+		log.Println("❌ Failed to publish Pub/Sub message:", pubErr)
+	}
+	ctx.StatusCode(iris.StatusOK)
+	ctx.JSON(iris.Map{"message": "Order payment processed", "orderID": order.ID, "userID": order.UserID, "amount": order.TotalAmount})
 }
 
 // POST /orders
@@ -45,16 +75,6 @@ func (oc *OrderController) CreateOrder(ctx iris.Context) {
 		ctx.StatusCode(iris.StatusInternalServerError)
 		ctx.JSON(iris.Map{"error": "Failed to create order"})
 		return
-	}
-
-	pubErr := pubsub.PublishOrderEvent(pubsub.OrderEvent{
-		OrderID: newOrder.ID,
-		UserID:  newOrder.UserID,
-		Amount:  newOrder.TotalAmount,
-	})
-
-	if pubErr != nil {
-		log.Println("❌ Failed to publish Pub/Sub message:", pubErr)
 	}
 
 	ctx.StatusCode(iris.StatusCreated)

@@ -1,7 +1,7 @@
 GET http://localhost:8080/test
 
 
-##
+###
 POST http://localhost:8080/orders
 Content-Type: application/json
 
@@ -13,6 +13,10 @@ Content-Type: application/json
     "status": "PENDING",
     "paymentId": null
 }
+
+###
+PATCH  http://localhost:8080/orders/be334f25-5fc3-4c29-8ac5-a763343b3d5e/paid
+Content-Type: application/json
 
 ###
 

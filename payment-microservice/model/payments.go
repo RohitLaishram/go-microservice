@@ -17,7 +17,7 @@ const (
 )
 
 type Payment struct {
-	ID        uuid.UUID      `gorm:"type:uuid;primaryKey"`
+	ID        uuid.UUID      `gorm:"type:char(255);primaryKey"`
 	OrderID   uuid.UUID      `gorm:"not null"`
 	UserID    uint           `gorm:"not null"`
 	Amount    float64        `gorm:"not null"`

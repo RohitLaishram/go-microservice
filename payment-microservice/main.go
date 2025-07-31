@@ -3,15 +3,13 @@ package main
 import (
 	"context"
 	"log"
-	"os"
-	"os/signal"
 	"payment/config"
 	"payment/pubsub"
 	"payment/repository"
-	"syscall"
 
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
+	"github.com/kataras/iris/v12"
 )
 
 type OrderEvent struct {
@@ -21,6 +19,9 @@ type OrderEvent struct {
 }
 
 func main() {
+	app := iris.New()
+	app.Use(iris.Compression)
+
 	_ = godotenv.Load()
 	db, err := config.ConnectWithGORM()
 
@@ -39,9 +40,9 @@ func main() {
 	}()
 
 	// Block forever (should never reach here)
-	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	<-c
-	log.Println("🛑 Gracefully shutting down...")
-	cancel()
+	app.Get("/test", func(ctx iris.Context) {
+		ctx.HTML("server is running")
+	})
+
+	app.Listen(":8081")
 }
